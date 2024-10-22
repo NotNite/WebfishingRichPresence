@@ -1,0 +1,74 @@
+#!python
+import os
+
+opts = Variables([], ARGUMENTS)
+
+env = DefaultEnvironment()
+env.Tool("compilation_db")
+compiledb = env.CompilationDatabase("compile_commands.json")
+
+opts.Add(
+    EnumVariable(
+        "target", "Compilation target", "release", ["d", "debug", "r", "release"]
+    )
+)
+opts.Add(PathVariable("target_path", "The path where the lib is installed.", "bin/"))
+opts.Add(
+    PathVariable("target_name", "The library name.", "librpc", PathVariable.PathAccept)
+)
+
+# Local dependency paths, adapt them to your setup
+godot_headers_path = "godot-cpp/godot-headers/"
+cpp_bindings_path = "godot-cpp/"
+cpp_library = "libgodot-cpp"
+
+# only support 64 at this time..
+bits = 64
+
+opts.Update(env)
+
+
+env["target_path"] += "win64/"
+cpp_library += ".windows"
+env.Append(ENV=os.environ)
+
+env.Append(CPPDEFINES=["WIN32", "_WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS"])
+env.Append(CCFLAGS=["-W3", "-GR"])
+env.Append(CXXFLAGS="/std:c++17")
+if env["target"] in ("debug", "d"):
+    env.Append(CPPDEFINES=["_DEBUG"])
+    env.Append(CCFLAGS=["-EHsc", "-MDd", "-ZI"])
+    env.Append(LINKFLAGS=["-DEBUG"])
+else:
+    env.Append(CPPDEFINES=["NDEBUG"])
+    env.Append(CCFLAGS=["-O2", "-EHsc", "-MD"])
+
+if env["target"] in ("debug", "d"):
+    cpp_library += ".debug"
+else:
+    cpp_library += ".release"
+
+cpp_library += "." + str(bits)
+
+env.Append(
+    CPPPATH=[
+        ".",
+        godot_headers_path,
+        cpp_bindings_path + "include/",
+        cpp_bindings_path + "include/core/",
+        cpp_bindings_path + "include/gen/",
+        "discord/cpp/",
+    ]
+)
+env.Append(LIBPATH=[cpp_bindings_path + "bin/", "discord/lib/x86_64/"])
+env.Append(LIBS=[cpp_library, "discord_game_sdk.dll"])
+sources = Glob("src/*.cpp") + Glob("discord/cpp/*.cpp")
+
+library = env.SharedLibrary(
+    target=env["target_path"] + env["target_name"], source=sources
+)
+
+Default(library)
+Default(compiledb)
+
+Help(opts.GenerateHelpText(env))
