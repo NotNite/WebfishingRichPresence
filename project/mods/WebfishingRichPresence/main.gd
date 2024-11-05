@@ -4,13 +4,20 @@ var rpc = null
 var node = null
 
 func _ready():
-	var rpc = load("res://mods/WebfishingRichPresence/librpc.gdns").instance()
+	var lib = GDNativeLibrary.new()
+	var cfg = ConfigFile.new()
+	cfg.set_value("entry", "Windows.64", "%LIBRPCPATH%")
+	print(cfg.get_value("entry", "Windows.64"))
+	lib.config_file = cfg
+
+	var script = NativeScript.new()
+	script.library = lib
+	script.resource_name = "librpc"
+	script.set_class_name("LibRPC")
+
 	node = Node.new()
 	self.add_child(node)
-	node.set_script(rpc)
-
-func _process(delta):
-	if node: node.run_callbacks()
+	node.set_script(script)
 
 func set_status(s):
 	if not node: return

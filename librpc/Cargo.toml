@@ -1,0 +1,11 @@
+[package]
+name = "librpc"
+version = "1.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+discord-rich-presence = "0.2.5"
+gdnative = "0.11.3"

@@ -1,3 +1,0 @@
-[submodule "module/godot-cpp"]
-	path = module/godot-cpp
-	url = https://github.com/godotengine/godot-cpp.git

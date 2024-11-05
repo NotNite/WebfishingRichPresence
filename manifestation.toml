@@ -1,20 +1,17 @@
 id = "WebfishingRichPresence"
 description = "Adds Discord Rich Presence to WEBFISHING"
-version = "1.0.1"
+version = "1.1.0"
 homepage = "https://github.com/NotNite/WebfishingRichPresence"
 author = "NotNite"
 
 icon = "icon.png"
 readme = "README.md"
 
-extra_files = [
-  "module/bin/win64/librpc.dll",
-  "module/discord/lib/x86_64/discord_game_sdk.dll",
-]
+extra_files = ["librpc/target/release/librpc.dll"]
 
 [project]
 csharp = "./WebfishingRichPresence/WebfishingRichPresence.csproj"
 godot = "./project/project.godot"
 
 [[dependencies]]
-thunderstore_version = "NotNet-GDWeave-2.0.12"
+thunderstore_version = "NotNet-GDWeave-2.0.13"
